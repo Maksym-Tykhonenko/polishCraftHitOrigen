@@ -29,12 +29,21 @@ target 'PolishCraft' do
   end
 
   post_install do |installer|
-    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    # Налаштування для React Native Pods
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :mac_catalyst_enabled => false
     )
+
+    # Додавання SWIFT_OPTIMIZATION_LEVEL = '-Onone' для певних залежностей
+    installer.pods_project.targets.each do |target|
+      if ['RCTDeprecation', 'RCT-Folly', 'BVLinearGradient', 'AppsFlyerFramework'].include? target.name
+        target.build_configurations.each do |config|
+          config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+        end
+      end
+    end
   end
 end
+
