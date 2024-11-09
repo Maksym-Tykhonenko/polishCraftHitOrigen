@@ -144,27 +144,31 @@ const App = () => {
     }
   };
 
-  ///////// AppsFlyer
-  // 1ST FUNCTION - Ініціалізація AppsFlyer
   const performAppsFlyerOperations = async () => {
     try {
+      // 1. Ініціалізація SDK
       await new Promise((resolve, reject) => {
-        appsFlyer.start(
+        appsFlyer.initSdk(
           {
             devKey: 'XFmBDwMitGREaZSaboCCRR',
             appId: '6737474419',
-            isStopped: false,
             isDebug: true,
             onInstallConversionDataListener: true,
             onDeepLinkListener: true,
             timeToWaitForATTUserAuthorization: 10,
+            manualStart: true, // Тепер ініціалізація без автоматичного старту
           },
           resolve,
           reject,
         );
       });
+
       console.log('App.js AppsFlyer ініціалізовано успішно');
-      // Отримуємо idfv та встановлюємо його як customerUserID
+
+      // 2. Після ініціалізації викликаємо startSdk()
+      appsFlyer.startSdk();
+
+      // 3. Отримуємо idfv та встановлюємо його як customerUserID
       const uniqueId = await DeviceInfo.getUniqueId();
       setIdfv(uniqueId); // Зберігаємо idfv у стейті
 
