@@ -14,7 +14,7 @@ import LegendsScreen from './src/screens/LegendsScreen';
 import PlacesScreen from './src/screens/PlacesScreen';
 import MapScreen from './src/screens/MapScreen';
 import PolishCraftHitOrigenProdactScreen from './src/screens/PolishCraftHitOrigenProdactScreen';
-//////////////////////////////////////////////
+///////////////////////////////////////////
 import ReactNativeIdfaAaid, {
   AdvertisingInfoResponse,
 } from '@sparkfabrik/react-native-idfa-aaid';
