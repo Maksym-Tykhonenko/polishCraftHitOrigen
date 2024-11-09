@@ -149,10 +149,11 @@ const App = () => {
   const performAppsFlyerOperations = async () => {
     try {
       await new Promise((resolve, reject) => {
-        appsFlyer.initSdk(
+        appsFlyer.start(
           {
             devKey: 'XFmBDwMitGREaZSaboCCRR',
             appId: '6737474419',
+            isStopped: false,
             isDebug: true,
             onInstallConversionDataListener: true,
             onDeepLinkListener: true,
