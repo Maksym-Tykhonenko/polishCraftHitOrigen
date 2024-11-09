@@ -36,13 +36,5 @@ target 'PolishCraft' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
-  # Додайте потрібні рівні оптимізації для конкретних бібліотек
-    installer.pods_project.targets.each do |target|
-      if ['BVLinearGradient', 'RCTDeprecation', 'RCT-Folly', 'DoubleConversion', 'AppsFlyerFramework'].include? target.name
-        target.build_configurations.each do |config|
-          config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
-        end
-      end
-    end
   end
 end
