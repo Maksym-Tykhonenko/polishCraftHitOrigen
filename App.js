@@ -20,6 +20,7 @@ import ReactNativeIdfaAaid, {
 } from '@sparkfabrik/react-native-idfa-aaid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 //import AppleAdsAttribution from '@hexigames/react-native-apple-ads-attribution';
+import AppleAdsAttribution from '@vladikstyle/react-native-apple-ads-attribution';
 import DeviceInfo from 'react-native-device-info';
 import appsFlyer from 'react-native-appsflyer';
 
@@ -40,8 +41,8 @@ const App = () => {
   console.log('pid==>', pid);
   const [adServicesToken, setAdServicesToken] = useState(null);
   //console.log('adServicesToken', adServicesToken);
-  //const [adServicesAtribution, setAdServicesAtribution] = useState(null);
-  //const [adServicesKeywordId, setAdServicesKeywordId] = useState(null);
+  const [adServicesAtribution, setAdServicesAtribution] = useState(null);
+  const [adServicesKeywordId, setAdServicesKeywordId] = useState(null);
   ////////
   const [customerUserId, setCustomerUserId] = useState(null);
   //console.log('customerUserID==>', customerUserId);
@@ -60,8 +61,8 @@ const App = () => {
     sab1,
     pid,
     adServicesToken,
-    //adServicesAtribution,
-    //adServicesKeywordId,
+    adServicesAtribution,
+    adServicesKeywordId,
     customerUserId,
     idfv,
   ]);
@@ -74,8 +75,8 @@ const App = () => {
         sab1,
         pid,
         adServicesToken,
-        //adServicesAtribution,
-        //adServicesKeywordId,
+        adServicesAtribution,
+        adServicesKeywordId,
         customerUserId,
         idfv,
       };
@@ -99,8 +100,8 @@ const App = () => {
         setSab1(parsedData.sab1);
         setPid(parsedData.pid);
         setAdServicesToken(parsedData.adServicesToken);
-        //setAdServicesAtribution(parsedData.adServicesAtribution);
-        //setAdServicesKeywordId(parsedData.adServicesKeywordId);
+        setAdServicesAtribution(parsedData.adServicesAtribution);
+        setAdServicesKeywordId(parsedData.adServicesKeywordId);
         setCustomerUserId(parsedData.customerUserId);
         setIdfv(parsedData.idfv);
       } else {
@@ -108,8 +109,8 @@ const App = () => {
         //await requestOneSignallFoo();
         await performAppsFlyerOperations();
         await getUidApps();
-        //await fetchAdServicesToken(); // Вставка функції для отримання токену
-        //await fetchAdServicesAttributionData(); // Вставка функції для отримання даних
+        await fetchAdServicesToken(); // Вставка функції для отримання токену
+        await fetchAdServicesAttributionData(); // Вставка функції для отримання даних
 
         onInstallConversionDataCanceller();
       }
@@ -118,7 +119,8 @@ const App = () => {
     }
   };
   {
-    /** 
+    /** */
+  }
   ///////// Ad Attribution
   //fetching AdServices token
   const fetchAdServicesToken = async () => {
@@ -144,8 +146,7 @@ const App = () => {
       console.error('Помилка при отриманні даних AdServices:', error.message);
     }
   };
-*/
-  }
+
   const performAppsFlyerOperations = async () => {
     try {
       // 1. Ініціалізація SDK
