@@ -19,7 +19,7 @@ import ReactNativeIdfaAaid, {
   AdvertisingInfoResponse,
 } from '@sparkfabrik/react-native-idfa-aaid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//import AppleAdsAttribution from '@hexigames/react-native-apple-ads-attribution';
+import {LogLevel, OneSignal} from 'react-native-onesignal';
 import AppleAdsAttribution from '@vladikstyle/react-native-apple-ads-attribution';
 import DeviceInfo from 'react-native-device-info';
 import appsFlyer from 'react-native-appsflyer';
@@ -106,7 +106,7 @@ const App = () => {
         setIdfv(parsedData.idfv);
       } else {
         await fetchIdfa();
-        //await requestOneSignallFoo();
+        await requestOneSignallFoo();
         await performAppsFlyerOperations();
         await getUidApps();
         await fetchAdServicesToken(); // Вставка функції для отримання токену
@@ -118,9 +118,7 @@ const App = () => {
       console.log('Помилка отримання даних:', e);
     }
   };
-  {
-    /** */
-  }
+
   ///////// Ad Attribution
   //fetching AdServices token
   const fetchAdServicesToken = async () => {
@@ -147,6 +145,8 @@ const App = () => {
     }
   };
 
+  ///////// AppsFlyer
+  // 1ST FUNCTION - Ініціалізація AppsFlyer
   const performAppsFlyerOperations = async () => {
     try {
       // 1. Ініціалізація SDK
@@ -237,6 +237,42 @@ const App = () => {
 
   ///////// OneSignall
   // 2abd1200-4d47-47c8-bd82-f9706b87ecf2
+  const requestPermission = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        OneSignal.Notifications.requestPermission(true);
+        resolve(); // Викликаємо resolve(), оскільки OneSignal.Notifications.requestPermission не повертає проміс
+      } catch (error) {
+        reject(error); // Викликаємо reject() у разі помилки
+      }
+    });
+  };
+
+  // Виклик асинхронної функції requestPermission() з використанням async/await
+  const requestOneSignallFoo = async () => {
+    try {
+      await requestPermission();
+      // Якщо все Ok
+    } catch (error) {
+      //console.log('err в requestOneSignallFoo==> ', error);
+    }
+  };
+
+  // Remove this method to stop OneSignal Debugging
+  OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+
+  // OneSignal Initialization
+  OneSignal.initialize('2abd1200-4d47-47c8-bd82-f9706b87ecf2');
+
+  OneSignal.Notifications.addEventListener('click', event => {
+    //console.log('OneSignal: notification clicked:', event);
+  });
+  //Add Data Tags
+  OneSignal.User.addTag('key', 'value');
+
+  {
+    /** */
+  }
 
   ///////// IDFA
   const fetchIdfa = async () => {
