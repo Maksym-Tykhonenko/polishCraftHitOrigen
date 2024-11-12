@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {enableScreens} from 'react-native-screens';
 import {NavigationContainer} from '@react-navigation/native';
@@ -175,7 +176,8 @@ const App = () => {
       setAdServicesAtribution(attributionValue);
       setAdServicesKeywordId(data.keywordId);
       setAdServicesToken(data?.token);
-      Alert.alert('data', data);
+      Alert.alert('attributionValue', attributionValue);
+      Alert.alert('keywordId', adServicesKeywordId);
       Alert.alert('token', adServicesToken);
     } catch (error) {
       console.error('Помилка при отриманні даних AdServices:', error.message);
