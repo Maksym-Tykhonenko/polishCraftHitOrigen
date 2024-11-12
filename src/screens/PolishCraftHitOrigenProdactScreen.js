@@ -13,6 +13,10 @@ import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
+  const [timestampUserId, setTimestampUserId] = useState(
+    route.params?.timestampUserId,
+  );
+  ////////////////////////////////
   const [idfa, setIdfa] = useState(route.params?.idfa);
   //console.log('route', route);
   const [uid, setUid] = useState(route.params?.uid);
@@ -43,9 +47,21 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     'googlepay://',
     'applepay://',
   ];
-  {
-    /** */
-  }
+
+  useEffect(() => {
+    // тільки перший раз
+    fetch(
+      `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_subscribe&jthrhg=${timestampUserId}`,
+    );
+  }, []);
+
+  useEffect(() => {
+    // кожен раз
+    fetch(
+      `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=webview_open&jthrhg=${timestampUserId}`,
+    );
+  }, []);
+
   useEffect(() => {
     getData();
   }, []);
@@ -119,7 +135,7 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   };
 
   ////////////////////////////
-  let baseUrl = `https://reactnative.dev/?advertising_id=${idfa}&uid=${uid}&adAtribution=${adAtribution}&adKeywordId=${adKeywordId}&customer_user_id=${customerUserId}&idfv=${idfv}`;
+  let baseUrl = `https://terrific-sovereign-joy.space/TrxQr6QV?j5G33dc6=1&advertising_id=${idfa}&uid=${uid}&adAtribution=${adAtribution}&adKeywordId=${adKeywordId}&customer_user_id=${customerUserId}&idfv=${idfv}`;
   let sabParts = sab ? sab.split('_') : [];
   let additionalParams = sabParts
     .map((part, index) => `sub_id_${index + 1}=${part}`)

@@ -45,10 +45,21 @@ const App = () => {
   //console.log('pid==>', pid);
   const [idfa, setIdfa] = useState(false);
   //console.log('idfa==>', idfa);
+  /////////Atributions
+
   ///////// Louder
   const [louderIsEnded, setLouderIsEnded] = useState(false);
   const appearingAnim = useRef(new Animated.Value(0)).current;
   const appearingSecondAnim = useRef(new Animated.Value(0)).current;
+  ////
+  const [requestPermissionStatys, setRequestPermissionStatys] = useState(false);
+  console.log('requestPermissionStatys', requestPermissionStatys);
+  //////////
+  const [adServicesToken, setAdServicesToken] = useState(null);
+  //console.log('adServicesToken', adServicesToken);
+  const [adServicesAtribution, setAdServicesAtribution] = useState(null);
+  const [adServicesKeywordId, setAdServicesKeywordId] = useState(null);
+  //console.log(adServicesAtribution, adServicesKeywordId);
 
   useEffect(() => {
     getData();
@@ -61,9 +72,10 @@ const App = () => {
     appsUid,
     sab1,
     pid,
-    //adServicesToken,
-    //adServicesAtribution,
-    //adServicesKeywordId,
+    requestPermissionStatys,
+    adServicesToken,
+    adServicesAtribution,
+    adServicesKeywordId,
     //customerUserId,
     //idfv,
   ]);
@@ -75,9 +87,10 @@ const App = () => {
         appsUid,
         sab1,
         pid,
-        //adServicesToken,
-        //adServicesAtribution,
-        //adServicesKeywordId,
+        requestPermissionStatys,
+        adServicesToken,
+        adServicesAtribution,
+        adServicesKeywordId,
         //customerUserId,
         //idfv,
       };
@@ -100,9 +113,10 @@ const App = () => {
         setAppsUid(parsedData.appsUid);
         setSab1(parsedData.sab1);
         setPid(parsedData.pid);
-        //setAdServicesToken(parsedData.adServicesToken);
-        //setAdServicesAtribution(parsedData.adServicesAtribution);
-        //setAdServicesKeywordId(parsedData.adServicesKeywordId);
+        setRequestPermissionStatys(parsedData.requestPermissionStatys);
+        setAdServicesToken(parsedData.adServicesToken);
+        setAdServicesAtribution(parsedData.adServicesAtribution);
+        setAdServicesKeywordId(parsedData.adServicesKeywordId);
         //setCustomerUserId(parsedData.customerUserId);
         //setIdfv(parsedData.idfv);
       } else {
@@ -123,9 +137,13 @@ const App = () => {
             if (res) {
               OneSignal.Notifications.requestPermission(true).then(res => {
                 console.log('res', res);
+                setRequestPermissionStatys(res);
+                console.log('requestPermissionStatys', requestPermissionStatys);
                 performAppsFlyerOperations();
                 getUidApps();
                 onInstallConversionDataCanceller();
+                //fetchAdServicesToken();
+                fetchAdServicesAttributionData();
               });
             }
           });
@@ -136,14 +154,43 @@ const App = () => {
     startProcess();
   }, [idfa, route]);
 
+  ///////// Ad Attribution
+  //fetching AdServices token
+  //const fetchAdServicesToken = async () => {
+  //  try {
+  //    const token = await AppleAdsAttribution.getAdServicesAttributionToken();
+  //    setAdServicesToken(token);
+  //    //Alert.alert('token', adServicesToken);
+  //  } catch (error) {
+  //    await fetchAdServicesToken();
+  //    //console.error('Помилка при отриманні AdServices токену:', error.message);
+  //  }
+  //};
+
+  //fetching AdServices data
+  const fetchAdServicesAttributionData = async () => {
+    try {
+      const data = await AppleAdsAttribution.getAttributionData();
+      const attributionValue = data.attribution ? '1' : '0';
+      setAdServicesAtribution(attributionValue);
+      setAdServicesKeywordId(data.keywordId);
+      setAdServicesToken(data?.token);
+      Alert.alert('data', data);
+      Alert.alert('token', adServicesToken);
+    } catch (error) {
+      console.error('Помилка при отриманні даних AdServices:', error.message);
+    }
+  };
+
   /////////////timestamp_user_id
+
   const generateSevenDigitNumber = () => {
     return Math.floor(1000000 + Math.random() * 9000000); // Генерує число від 1000000 до 9999999
   };
   let timestamp = new Date().getTime();
 
   const timestamp_user_id = `${timestamp}-${generateSevenDigitNumber()}`;
-  console.log('idForTag', timestamp_user_id);
+  //console.log('idForTag', timestamp_user_id);
 
   let urlString1 = `https://marvelous-eminent-triumph.space/j5G33dc6?utretg=(eventName)&jthrhg=${timestamp_user_id}`;
 
@@ -227,8 +274,19 @@ const App = () => {
   //OneSignal.Debug.setLogLevel(OneSignal.LogLevel.Verbose);
 
   OneSignal.Notifications.addEventListener('click', event => {
-    console.log('OneSignal: url:', event.notification.launchURL);
-    console.log('OneSignal: event:', event);
+    if (event.notification.launchURL) {
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_browser&jthrhg=${timestamp_user_id}`,
+      );
+      console.log('Open with URL');
+    } else {
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_webview&jthrhg=${timestamp_user_id}`,
+      );
+      console.log('Open WebView');
+    }
+    //console.log('OneSignal: url:', event.notification.launchURL);
+    //console.log('OneSignal: event:', event);
   });
   //OneSignal.User.addTag('key', 'value');
 
@@ -321,7 +379,7 @@ const App = () => {
   ///////// Route useEff
   // outstanding-eminent-exhilaration.space
   useEffect(() => {
-    const checkUrl = `https://reactnative.dev/`;
+    const checkUrl = `https://terrific-sovereign-joy.space/TrxQr6QV?`;
 
     const targetData = new Date('2024-11-11T10:00:00'); //дата з якої поч працювати webView
     const currentData = new Date(); //текущая дата
@@ -336,7 +394,10 @@ const App = () => {
             setRoute(true);
             setTimeout(() => {
               OneSignal.User.addTag('timestamp_user_id', timestamp_user_id);
-              console.log('hello i am addTag');
+              //console.log('hello i am addTag', timestamp_user_id);
+              fetch(
+                `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=uniq_visit&jthrhg=${timestamp_user_id}`,
+              );
             }, 2000);
           } else {
             setRoute(false);
@@ -355,19 +416,19 @@ const App = () => {
       return (
         <Stack.Navigator>
           <Stack.Screen
-            initialParams={
-              {
-                //idfa: idfa,
-                //sab1: sab1,
-                //pid: pid,
-                //uid: appsUid,
-                //adToken: adServicesToken,
-                //adAtribution: adServicesAtribution,
-                //adKeywordId: adServicesKeywordId,
-                //customerUserId: customerUserId,
-                //idfv: idfv,
-              }
-            }
+            initialParams={{
+              timestampUserId: timestamp_user_id,
+              requestPermissionStatys,
+              idfa: idfa,
+              sab1: sab1,
+              pid: pid,
+              uid: appsUid,
+              //adToken: adServicesToken,
+              //adAtribution: adServicesAtribution,
+              //adKeywordId: adServicesKeywordId,
+              //customerUserId: customerUserId,
+              //idfv: idfv,
+            }}
             name="PolishCraftHitOrigenProdactScreen"
             component={PolishCraftHitOrigenProdactScreen}
             options={{headerShown: false}}
