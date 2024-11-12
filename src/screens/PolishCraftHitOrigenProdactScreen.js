@@ -13,19 +13,19 @@ import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
-  //const [idfa, setIdfa] = useState(route.params?.idfa);
+  const [idfa, setIdfa] = useState(route.params?.idfa);
   //console.log('route', route);
-  //const [uid, setUid] = useState(route.params?.uid);
-  //const [sab, setSab] = useState(route.params?.sab1);
-  //const [pid, setPid] = useState(route.params?.pid);
-  //const [adToken, setAdToken] = useState(route.params?.adToken);
-  //const [adAtribution, setAdAtribution] = useState(route.params?.adAtribution);
-  //const [adKeywordId, setAdKeywordId] = useState(route.params?.adKeywordId);
-  //const [idfv, setIdfv] = useState(route.params?.idfv);
-  ////console.log('idfvInProductScr============================>', idfv);
-  //const [customerUserId, setCustomerUserId] = useState(
-  //  route.params?.customerUserId,
-  //);
+  const [uid, setUid] = useState(route.params?.uid);
+  const [sab, setSab] = useState(route.params?.sab1);
+  const [pid, setPid] = useState(route.params?.pid);
+  const [adToken, setAdToken] = useState(route.params?.adToken);
+  const [adAtribution, setAdAtribution] = useState(route.params?.adAtribution);
+  const [adKeywordId, setAdKeywordId] = useState(route.params?.adKeywordId);
+  const [idfv, setIdfv] = useState(route.params?.idfv);
+  //console.log('idfvInProductScr============================>', idfv);
+  const [customerUserId, setCustomerUserId] = useState(
+    route.params?.customerUserId,
+  );
 
   const refWebview = useRef(null);
 
@@ -44,7 +44,8 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     'applepay://',
   ];
   {
-    /** 
+    /** */
+  }
   useEffect(() => {
     getData();
   }, []);
@@ -78,9 +79,9 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
       };
       const jsonData = JSON.stringify(data);
       await AsyncStorage.setItem('SecretTreasureProdactScreen', jsonData);
-      console.log('Дані збережено в AsyncStorage');
+      //console.log('Дані збережено в AsyncStorage');
     } catch (e) {
-      console.log('Помилка збереження даних:', e);
+      //console.log('Помилка збереження даних:', e);
     }
   };
 
@@ -91,7 +92,7 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
       );
       if (jsonData !== null) {
         const parsedData = JSON.parse(jsonData);
-        console.log('parsedData==>', parsedData);
+        //console.log('parsedData==>', parsedData);
         setIdfa(parsedData.idfa);
         setUid(parsedData.uid);
         setSab(parsedData.sab);
@@ -104,10 +105,9 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
       } else {
       }
     } catch (e) {
-      console.log('Помилка отримання даних:', e);
+      //console.log('Помилка отримання даних:', e);
     }
-  };*/
-  }
+  };
 
   // кастомний юзерагент
   const deviceInfo = {
@@ -118,41 +118,41 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     deviceSystemVersion: DeviceInfo.getSystemVersion(),
   };
 
-  //////////////////////////////
-  //let baseUrl = `https://marvelous-grand-joy.space/x3LZhrRP?advertising_id=${idfa}&uid=${uid}&adAtribution=${adAtribution}&adKeywordId=${adKeywordId}&customer_user_id=${customerUserId}&idfv=${idfv}`;
-  //let sabParts = sab ? sab.split('_') : [];
-  //let additionalParams = sabParts
-  //  .map((part, index) => `sub_id_${index + 1}=${part}`)
-  //  .join('&'); //
-  //const product = `${baseUrl}&${additionalParams}` + (pid ? `&pid=${pid}` : '');
+  ////////////////////////////
+  let baseUrl = `https://reactnative.dev/?advertising_id=${idfa}&uid=${uid}&adAtribution=${adAtribution}&adKeywordId=${adKeywordId}&customer_user_id=${customerUserId}&idfv=${idfv}`;
+  let sabParts = sab ? sab.split('_') : [];
+  let additionalParams = sabParts
+    .map((part, index) => `sub_id_${index + 1}=${part}`)
+    .join('&'); //
+  const product = `${baseUrl}&${additionalParams}` + (pid ? `&pid=${pid}` : '');
   //console.log('My product Url==>', product);
-  ////Alert.alert(product);
+  //Alert.alert(product);
 
   //const customUserAgent = `Mozilla/5.0 (${deviceInfo.deviceSystemName}; ${deviceInfo.deviceModel}) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1`;
   //const customUserAgent = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0) Gecko/20100101 Firefox/91.0`;
 
   const userAgent = `Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Safari/604.1`;
   const customUserAgent = `${userAgent} Safari/604.1`;
-  console.log(customUserAgent);
+  //console.log(customUserAgent);
 
   useEffect(() => {
     WebView.userAgent = customUserAgent;
   }, []);
   ///////////////////////////
 
-  //const [redirectUrl, setRedirectUrl] = useState(product);
+  const [redirectUrl, setRedirectUrl] = useState(product);
   const [checkNineUrl, setCheckNineUrl] = useState();
-  console.log('checkNineUrl====>', checkNineUrl);
+  //console.log('checkNineUrl====>', checkNineUrl);
 
   const handleShouldStartLoad = event => {
     const {url} = event;
-    //console.log('Should Start Load: ', url);
+    ////console.log('Should Start Load: ', url);
     return true;
   };
 
   const handleNavigationStateChange = navState => {
     const {url} = navState;
-    console.log('NavigationState: ', url);
+    //console.log('NavigationState: ', url);
     //console.log('navState: ', navState);
     if (
       url.includes(
@@ -317,10 +317,10 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
           'tel:*',
           'mailto:*',
         ]}
-        //onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-        //onNavigationStateChange={handleNavigationStateChange}
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onNavigationStateChange={handleNavigationStateChange}
         source={{
-          uri: `https://reactnative.dev/`,
+          uri: product,
         }}
         textZoom={100}
         allowsBackForwardNavigationGestures={true}
