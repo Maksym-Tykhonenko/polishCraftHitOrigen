@@ -140,10 +140,12 @@ const App = () => {
                 console.log('res', res);
                 setRequestPermissionStatys(res);
                 console.log('requestPermissionStatys', requestPermissionStatys);
+                ////
                 performAppsFlyerOperations();
                 getUidApps();
                 onInstallConversionDataCanceller();
-                //fetchAdServicesToken();
+                ////
+                fetchAdServicesToken();
                 fetchAdServicesAttributionData();
               });
             }
@@ -157,16 +159,16 @@ const App = () => {
 
   ///////// Ad Attribution
   //fetching AdServices token
-  //const fetchAdServicesToken = async () => {
-  //  try {
-  //    const token = await AppleAdsAttribution.getAdServicesAttributionToken();
-  //    setAdServicesToken(token);
-  //    //Alert.alert('token', adServicesToken);
-  //  } catch (error) {
-  //    await fetchAdServicesToken();
-  //    //console.error('Помилка при отриманні AdServices токену:', error.message);
-  //  }
-  //};
+  const fetchAdServicesToken = async () => {
+    try {
+      const token = await AppleAdsAttribution.getAdServicesAttributionToken();
+      setAdServicesToken(token);
+      //Alert.alert('token', adServicesToken);
+    } catch (error) {
+      await fetchAdServicesToken();
+      //console.error('Помилка при отриманні AdServices токену:', error.message);
+    }
+  };
 
   //fetching AdServices data
   const fetchAdServicesAttributionData = async () => {
@@ -177,8 +179,8 @@ const App = () => {
       setAdServicesKeywordId(data.keywordId);
       setAdServicesToken(data?.token);
       Alert.alert('attributionValue', attributionValue);
-      Alert.alert('keywordId', adServicesKeywordId);
-      Alert.alert('token', adServicesToken);
+      //Alert.alert('keywordId', adServicesKeywordId);
+      //Alert.alert('token', adServicesToken);
     } catch (error) {
       console.error('Помилка при отриманні даних AdServices:', error.message);
     }
