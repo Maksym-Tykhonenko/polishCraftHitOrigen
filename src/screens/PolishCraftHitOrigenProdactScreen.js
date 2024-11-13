@@ -11,14 +11,16 @@ import {
 import {WebView} from 'react-native-webview';
 import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LogLevel, OneSignal} from 'react-native-onesignal';
 
 const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
-  const [timestampUserId, setTimestampUserId] = useState(
-    route.params?.timestampUserId,
+  const [responseToPushPermition, setResponseToPushPermition] = useState(
+    route.params?.responseToPushPermition,
   );
+  const [addPartToLinkOnce, setAddPartToLinkOnce] = useState(false);
   ////////////////////////////////
+  const [oneSignalId, setOneSignalId] = useState(route.params?.oneSignalId);
   const [idfa, setIdfa] = useState(route.params?.idfa);
-  //console.log('route', route);
   const [uid, setUid] = useState(route.params?.uid);
   const [sab, setSab] = useState(route.params?.sab1);
   const [pid, setPid] = useState(route.params?.pid);
@@ -48,18 +50,32 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     'applepay://',
   ];
 
+  {
+    /**івент push_subscribe */
+  }
   useEffect(() => {
     // тільки перший раз
-    fetch(
-      `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_subscribe&jthrhg=${timestampUserId}`,
-    );
+    setTimeout(() => {
+      if (responseToPushPermition) {
+        console.log('Відпрацював івент push_subscribe');
+        fetch(
+          `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_subscribe&jthrhg=${timestamp_user_id}`,
+        );
+        setResponseToPushPermition(true);
+      }
+    }, 500);
   }, []);
 
+  {
+    /**івент webview_open */
+  }
   useEffect(() => {
     // кожен раз
-    fetch(
-      `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=webview_open&jthrhg=${timestampUserId}`,
-    );
+    setTimeout(() => {
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=webview_open&jthrhg=${timestamp_user_id}`,
+      );
+    }, 500);
   }, []);
 
   useEffect(() => {
@@ -69,6 +85,8 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   useEffect(() => {
     setData();
   }, [
+    addPartToLinkOnce,
+    responseToPushPermition,
     idfa,
     uid,
     sab,
@@ -83,6 +101,8 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   const setData = async () => {
     try {
       const data = {
+        addPartToLinkOnce,
+        responseToPushPermition,
         idfa,
         uid,
         sab,
@@ -109,6 +129,8 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
       if (jsonData !== null) {
         const parsedData = JSON.parse(jsonData);
         //console.log('parsedData==>', parsedData);
+        setAddPartToLinkOnce(parsedData.addPartToLinkOnce);
+        setResponseToPushPermition(parsedData.responseToPushPermition);
         setIdfa(parsedData.idfa);
         setUid(parsedData.uid);
         setSab(parsedData.sab);
@@ -125,6 +147,37 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     }
   };
 
+  /////////////Timestamp + user_id generation
+  const generateSevenDigitNumber = () => {
+    return Math.floor(1000000 + Math.random() * 9000000); // Генерує число від 1000000 до 9999999
+  };
+  let timestamp = new Date().getTime();
+
+  const timestamp_user_id = `${timestamp}-${generateSevenDigitNumber()}`;
+  //console.log('idForTag', timestamp_user_id);
+
+  OneSignal.Notifications.addEventListener('click', event => {
+    if (event.notification.launchURL) {
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_browser&jthrhg=${timestamp_user_id}`,
+      );
+
+      console.log('Open with URL');
+    } else {
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_webview&jthrhg=${timestamp_user_id}`,
+      );
+      setAddPartToLinkOnce(true);
+      {
+        /** Done
+         * Єдиноразово додати до лінки product &yhugh=true !!!!!!!!!!!!!!!!!!*/
+      }
+      console.log('Open WebView');
+    }
+    //console.log('OneSignal: url:', event.notification.launchURL);
+    //console.log('OneSignal: event:', event);
+  });
+
   // кастомний юзерагент
   const deviceInfo = {
     deviceBrand: DeviceInfo.getBrand(),
@@ -135,13 +188,16 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   };
 
   ////////////////////////////
-  let baseUrl = `https://terrific-sovereign-joy.space/TrxQr6QV?j5G33dc6=1&advertising_id=${idfa}&uid=${uid}&adAtribution=${adAtribution}&adKeywordId=${adKeywordId}&customer_user_id=${customerUserId}&idfv=${idfv}`;
+  let baseUrl = `https://terrific-sovereign-joy.space/TrxQr6QV?TrxQr6QV=1&advertising_id=${idfa}&uid=${uid}&adAtribution=${adAtribution}&adKeywordId=${adKeywordId}&customer_user_id=${customerUserId}&idfv=${idfv}&onesignal_id=${oneSignalId}`;
   let sabParts = sab ? sab.split('_') : [];
   let additionalParams = sabParts
     .map((part, index) => `sub_id_${index + 1}=${part}`)
     .join('&'); //
-  const product = `${baseUrl}&${additionalParams}` + (pid ? `&pid=${pid}` : '');
-  //console.log('My product Url==>', product);
+  const product =
+    `${baseUrl}&${additionalParams}` +
+    (pid ? `&pid=${pid}` : '') +
+    (!addPartToLinkOnce ? `&yhugh=true` : '');
+  console.log('My product Url==>', product);
   //Alert.alert(product);
 
   //const customUserAgent = `Mozilla/5.0 (${deviceInfo.deviceSystemName}; ${deviceInfo.deviceModel}) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1`;

@@ -38,29 +38,49 @@ const Stack = createStackNavigator();
 
 const App = () => {
   const [route, setRoute] = useState(false);
-  const [appsUid, setAppsUid] = useState(null);
-  const [sab1, setSab1] = useState();
-  const [pid, setPid] = useState();
-  //console.log('appsUid==>', appsUid);
-  //console.log('sab1==>', sab1);
-  //console.log('pid==>', pid);
-  const [idfa, setIdfa] = useState(false);
-  //console.log('idfa==>', idfa);
-  /////////Atributions
-
+  console.log('route===>', route);
+  const [responseToPushPermition, setResponseToPushPermition] = useState(false);
+  console.log('Дозвіл на пуши прийнято? ===>', responseToPushPermition);
+  const [uniqVisit, setUniqVisit] = useState(true);
+  console.log('uniqVisit===>', uniqVisit);
   ///////// Louder
   const [louderIsEnded, setLouderIsEnded] = useState(false);
   const appearingAnim = useRef(new Animated.Value(0)).current;
   const appearingSecondAnim = useRef(new Animated.Value(0)).current;
-  ////
-  const [requestPermissionStatys, setRequestPermissionStatys] = useState(false);
-  console.log('requestPermissionStatys', requestPermissionStatys);
-  //////////
+  //////////////////Parametrs
+  const [idfa, setIdfa] = useState(false);
+  console.log('idfa==>', idfa);
+  const [oneSignalId, setOneSignalId] = useState(null);
+  console.log('oneSignalId==>', oneSignalId);
+  const [appsUid, setAppsUid] = useState(null);
+  const [sab1, setSab1] = useState();
+  const [pid, setPid] = useState();
+  console.log('appsUid==>', appsUid);
+  console.log('sab1==>', sab1);
+  console.log('pid==>', pid);
+  const [customerUserId, setCustomerUserId] = useState(null);
+  console.log('customerUserID==>', customerUserId);
+  const [idfv, setIdfv] = useState();
+  console.log('idfv==>', idfv);
+  /////////Atributions
   const [adServicesToken, setAdServicesToken] = useState(null);
   //console.log('adServicesToken', adServicesToken);
   const [adServicesAtribution, setAdServicesAtribution] = useState(null);
   const [adServicesKeywordId, setAdServicesKeywordId] = useState(null);
-  //console.log(adServicesAtribution, adServicesKeywordId);
+
+  // uniq_visit
+  useEffect(() => {
+    setTimeout(() => {
+      if (uniqVisit) {
+        fetch(
+          `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=uniq_visit&jthrhg=${timestamp_user_id}`,
+        );
+        OneSignal.User.addTag('timestamp_user_id', timestamp_user_id);
+        setUniqVisit(false); //
+        console.log('Відпрацював унік візит!!!!!!!!');
+      }
+    }, 500);
+  }, []);
 
   useEffect(() => {
     getData();
@@ -69,31 +89,37 @@ const App = () => {
   useEffect(() => {
     setData();
   }, [
+    route,
+    responseToPushPermition,
+    uniqVisit,
+    oneSignalId,
     idfa,
     appsUid,
     sab1,
     pid,
-    requestPermissionStatys,
+    customerUserId,
+    idfv,
     adServicesToken,
     adServicesAtribution,
     adServicesKeywordId,
-    //customerUserId,
-    //idfv,
   ]);
 
   const setData = async () => {
     try {
       const data = {
+        route,
+        responseToPushPermition,
+        uniqVisit,
+        oneSignalId,
         idfa,
         appsUid,
         sab1,
         pid,
-        requestPermissionStatys,
+        customerUserId,
+        idfv,
         adServicesToken,
         adServicesAtribution,
         adServicesKeywordId,
-        //customerUserId,
-        //idfv,
       };
       const jsonData = JSON.stringify(data);
       await AsyncStorage.setItem('App', jsonData);
@@ -110,53 +136,35 @@ const App = () => {
         const parsedData = JSON.parse(jsonData);
         //console.log('Дані дістаються в AsyncStorage');
         //console.log('parsedData in App==>', parsedData);
+        setRoute(parsedData.route);
+        setResponseToPushPermition(parsedData.responseToPushPermition);
+        setUniqVisit(parsedData.uniqVisit);
+        setOneSignalId(parsedData.oneSignalId);
         setIdfa(parsedData.idfa);
         setAppsUid(parsedData.appsUid);
         setSab1(parsedData.sab1);
         setPid(parsedData.pid);
-        setRequestPermissionStatys(parsedData.requestPermissionStatys);
+        setCustomerUserId(parsedData.customerUserId);
+        setIdfv(parsedData.idfv);
         setAdServicesToken(parsedData.adServicesToken);
         setAdServicesAtribution(parsedData.adServicesAtribution);
         setAdServicesKeywordId(parsedData.adServicesKeywordId);
-        //setCustomerUserId(parsedData.customerUserId);
-        //setIdfv(parsedData.idfv);
+        //
       } else {
         console.log('Даних немає в AsyncStorage');
+        await fetchIdfa();
+        await requestOneSignallFoo();
+        await performAppsFlyerOperations();
+        await getUidApps();
+        await fetchAdServicesToken(); // Вставка функції для отримання токену
+        await fetchAdServicesAttributionData(); // Вставка функції для отримання даних
+
+        onInstallConversionDataCanceller();
       }
     } catch (e) {
       console.log('Помилка отримання даних:', e);
     }
   };
-
-  useEffect(() => {
-    const startProcess = async () => {
-      if (route) {
-        await fetchIdfa();
-        if (idfa) {
-          await OneSignal.Notifications.canRequestPermission().then(res => {
-            //console.log('res', res);
-            if (res) {
-              OneSignal.Notifications.requestPermission(true).then(res => {
-                console.log('res', res);
-                setRequestPermissionStatys(res);
-                console.log('requestPermissionStatys', requestPermissionStatys);
-                ////
-                performAppsFlyerOperations();
-                getUidApps();
-                onInstallConversionDataCanceller();
-                ////
-                fetchAdServicesToken();
-                fetchAdServicesAttributionData();
-              });
-            }
-          });
-        }
-      }
-    };
-
-    startProcess();
-  }, [idfa, route]);
-
   ///////// Ad Attribution
   //fetching AdServices token
   const fetchAdServicesToken = async () => {
@@ -173,21 +181,17 @@ const App = () => {
   //fetching AdServices data
   const fetchAdServicesAttributionData = async () => {
     try {
-      const data = await AppleAdsAttribution.getAttributionData();
+      const data = await AppleAdsAttribution.getAdServicesAttributionData();
       const attributionValue = data.attribution ? '1' : '0';
       setAdServicesAtribution(attributionValue);
       setAdServicesKeywordId(data.keywordId);
-      setAdServicesToken(data?.token);
-      Alert.alert('attributionValue', attributionValue);
-      //Alert.alert('keywordId', adServicesKeywordId);
-      //Alert.alert('token', adServicesToken);
+      //Alert.alert('data', data)
     } catch (error) {
       console.error('Помилка при отриманні даних AdServices:', error.message);
     }
   };
 
-  /////////////timestamp_user_id
-
+  /////////////Timestamp + user_id generation
   const generateSevenDigitNumber = () => {
     return Math.floor(1000000 + Math.random() * 9000000); // Генерує число від 1000000 до 9999999
   };
@@ -196,79 +200,33 @@ const App = () => {
   const timestamp_user_id = `${timestamp}-${generateSevenDigitNumber()}`;
   //console.log('idForTag', timestamp_user_id);
 
-  let urlString1 = `https://marvelous-eminent-triumph.space/j5G33dc6?utretg=(eventName)&jthrhg=${timestamp_user_id}`;
-
-  ////////////////// Louder
-  useEffect(() => {
-    Animated.timing(appearingAnim, {
-      toValue: 1,
-      duration: 8000,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-      Animated.timing(appearingSecondAnim, {
-        toValue: 1,
-        duration: 3500,
-        useNativeDriver: true,
-      }).start();
-      //setLouderIsEnded(true);
-    }, 3500);
-  }, []);
-
-  //useEffect(() => {
-  //  setTimeout(() => {
-  //    setLouderIsEnded(true);
-  //  }, 8000);
-  //}, []);
-
-  ///////// IDFA
-  const fetchIdfa = async () => {
-    try {
-      const res = await ReactNativeIdfaAaid.getAdvertisingInfo();
-      if (!res.isAdTrackingLimited) {
-        setIdfa(res.id);
-        //console.log('setIdfa(res.id);');
-      } else {
-        //console.log('Ad tracking is limited');
-        setIdfa(false); //true
-        //setIdfa(null);
-        fetchIdfa();
-        //Alert.alert('idfa', idfa);
-      }
-    } catch (err) {
-      //console.log('err', err);
-      setIdfa(null);
-      await fetchIdfa(); //???
-    }
-  };
-
   ///////// OneSignall
   // 2abd1200-4d47-47c8-bd82-f9706b87ecf2
-  ///////// Перевірка дозволів OneSignal
-  //const requestOneSignalPermission = async () => {
-  //  try {
-  //    const canRequest = await OneSignal.Notifications.canRequestPermission();
-  //    if (canRequest) {
-  //      const permissionGranted =
-  //        await OneSignal.Notifications.requestPermission(true);
-  //      if (permissionGranted) {
-  //        console.log('Дозвіл OneSignal надано');
-  //        await performAppsFlyerOperations();
-  //        await getUidApps();
-  //        onInstallConversionDataCanceller();
-  //      } else {
-  //        console.log('Дозвіл OneSignal не надано');
-  //      }
-  //    } else {
-  //      console.log('Не можна запросити дозвіл OneSignal');
-  //    }
-  //  } catch (error) {
-  //    console.log('Помилка в запиті дозволу OneSignal:', error);
-  //  }
-  //};
+  const requestPermission = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        OneSignal.Notifications.requestPermission(true).then(res => {
+          console.log('res', res);
+          // зберігаємо в Стейт стан по відповіді на дозвіл на пуши і зберігаємо їх в АсСторідж
+          setResponseToPushPermition(res);
+        });
+
+        resolve(); // Викликаємо resolve(), оскільки OneSignal.Notifications.requestPermission не повертає проміс
+      } catch (error) {
+        reject(error); // Викликаємо reject() у разі помилки
+      }
+    });
+  };
+
+  // Виклик асинхронної функції requestPermission() з використанням async/await
+  const requestOneSignallFoo = async () => {
+    try {
+      await requestPermission();
+      // Якщо все Ok
+    } catch (error) {
+      //console.log('err в requestOneSignallFoo==> ', error);
+    }
+  };
 
   // Remove this method to stop OneSignal Debugging
   OneSignal.Debug.setLogLevel(LogLevel.Verbose);
@@ -278,21 +236,26 @@ const App = () => {
   //OneSignal.Debug.setLogLevel(OneSignal.LogLevel.Verbose);
 
   OneSignal.Notifications.addEventListener('click', event => {
-    if (event.notification.launchURL) {
-      fetch(
-        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_browser&jthrhg=${timestamp_user_id}`,
-      );
-      console.log('Open with URL');
-    } else {
-      fetch(
-        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_webview&jthrhg=${timestamp_user_id}`,
-      );
-      console.log('Open WebView');
-    }
-    //console.log('OneSignal: url:', event.notification.launchURL);
-    //console.log('OneSignal: event:', event);
+    //console.log('OneSignal: notification clicked:', event);
   });
+  //Add Data Tags
   //OneSignal.User.addTag('key', 'value');
+
+  ////////////////////OneSignall Id generation
+  useEffect(() => {
+    const fetchOneSignalId = async () => {
+      try {
+        const deviceState = await OneSignal.User.getOnesignalId();
+        if (deviceState) {
+          setOneSignalId(deviceState); //  OneSignal ID
+        }
+      } catch (error) {
+        console.error('Error fetching OneSignal ID:', error);
+      }
+    };
+
+    fetchOneSignalId();
+  }, []);
 
   ///////// AppsFlyer
   // 1ST FUNCTION - Ініціалізація AppsFlyer
@@ -315,15 +278,17 @@ const App = () => {
         );
       });
 
-      console.log('App.js AppsFlyer ініціалізовано успішно');
-
-      // 2. Після ініціалізації викликаємо startSdk()
       appsFlyer.startSdk();
 
-      //appsFlyer.setCustomerUserId(uniqueId, res => {
-      //  console.log('Customer User ID встановлено успішно:', uniqueId);
-      //  setCustomerUserId(uniqueId); // Зберігаємо customerUserID у стейті
-      //});
+      console.log('App.js AppsFlyer ініціалізовано успішно');
+      // Отримуємо idfv та встановлюємо його як customerUserID
+      const uniqueId = await DeviceInfo.getUniqueId();
+      setIdfv(uniqueId); // Зберігаємо idfv у стейті
+
+      appsFlyer.setCustomerUserId(uniqueId, res => {
+        console.log('Customer User ID встановлено успішно:', uniqueId);
+        setCustomerUserId(uniqueId); // Зберігаємо customerUserID у стейті
+      });
     } catch (error) {
       console.log(
         'App.js Помилка під час виконання операцій AppsFlyer:',
@@ -379,6 +344,26 @@ const App = () => {
       }
     },
   );
+  ///////// IDFA
+  const fetchIdfa = async () => {
+    try {
+      const res = await ReactNativeIdfaAaid.getAdvertisingInfo();
+      if (!res.isAdTrackingLimited) {
+        setIdfa(res.id);
+        //console.log('setIdfa(res.id);');
+      } else {
+        //console.log('Ad tracking is limited');
+        setIdfa(false); //true
+        //setIdfa(null);
+        fetchIdfa();
+        //Alert.alert('idfa', idfa);
+      }
+    } catch (err) {
+      //console.log('err', err);
+      setIdfa(null);
+      await fetchIdfa(); //???
+    }
+  };
 
   ///////// Route useEff
   // outstanding-eminent-exhilaration.space
@@ -388,30 +373,26 @@ const App = () => {
     const targetData = new Date('2024-11-11T10:00:00'); //дата з якої поч працювати webView
     const currentData = new Date(); //текущая дата
 
-    if (currentData <= targetData) {
-      setRoute(false);
-    } else {
-      fetch(checkUrl)
-        .then(r => {
-          if (r.status === 200) {
-            //console.log('status==>', r.status);
-            setRoute(true);
-            setTimeout(() => {
-              OneSignal.User.addTag('timestamp_user_id', timestamp_user_id);
-              //console.log('hello i am addTag', timestamp_user_id);
-              fetch(
-                `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=uniq_visit&jthrhg=${timestamp_user_id}`,
-              );
-            }, 2000);
-          } else {
+    if (!route) {
+      if (currentData <= targetData) {
+        setRoute(false);
+      } else {
+        fetch(checkUrl)
+          .then(r => {
+            if (r.status === 200) {
+              console.log('status по клоаке==>', r.status);
+              setRoute(true);
+            } else {
+              setRoute(false);
+            }
+          })
+          .catch(e => {
+            //console.log('errar', e);
             setRoute(false);
-          }
-        })
-        .catch(e => {
-          //console.log('errar', e);
-          setRoute(false);
-        });
+          });
+      }
     }
+    return;
   }, []);
 
   ///////// Route
@@ -421,17 +402,17 @@ const App = () => {
         <Stack.Navigator>
           <Stack.Screen
             initialParams={{
-              timestampUserId: timestamp_user_id,
-              requestPermissionStatys,
+              responseToPushPermition, //в вебВью якщо тру то відправити івент push_subscribe
+              oneSignalId, //додати до фінальної лінки
               idfa: idfa,
               sab1: sab1,
               pid: pid,
               uid: appsUid,
-              //adToken: adServicesToken,
-              //adAtribution: adServicesAtribution,
-              //adKeywordId: adServicesKeywordId,
-              //customerUserId: customerUserId,
-              //idfv: idfv,
+              customerUserId: customerUserId,
+              idfv: idfv,
+              adToken: adServicesToken,
+              adAtribution: adServicesAtribution,
+              adKeywordId: adServicesKeywordId,
             }}
             name="PolishCraftHitOrigenProdactScreen"
             component={PolishCraftHitOrigenProdactScreen}
@@ -495,6 +476,32 @@ const App = () => {
       </Stack.Navigator>
     );
   };
+
+  ////////////////// Louder
+  useEffect(() => {
+    Animated.timing(appearingAnim, {
+      toValue: 1,
+      duration: 8000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      Animated.timing(appearingSecondAnim, {
+        toValue: 1,
+        duration: 3500,
+        useNativeDriver: true,
+      }).start();
+      //setLouderIsEnded(true);
+    }, 3500);
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLouderIsEnded(true);
+    }, 8000);
+  }, []);
 
   return (
     <NavigationContainer>
