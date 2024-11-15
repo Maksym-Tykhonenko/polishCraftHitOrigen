@@ -185,7 +185,7 @@ const App = () => {
       //console.error('Помилка при отриманні AdServices токену:', error.message);
     }
   };
-/
+
   //fetching AdServices data
   const fetchAdServicesAttributionData = async () => {
     try {
