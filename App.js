@@ -38,94 +38,58 @@ const Stack = createStackNavigator();
 
 const App = () => {
   const [route, setRoute] = useState(false);
-  console.log('route===>', route);
+  //console.log('route===>', route);
   const [responseToPushPermition, setResponseToPushPermition] = useState(false);
-  console.log('Дозвіл на пуши прийнято? ===>', responseToPushPermition);
+  //console.log('Дозвіл на пуши прийнято? ===>', responseToPushPermition);
   const [uniqVisit, setUniqVisit] = useState(true);
-  console.log('uniqVisit===>', uniqVisit);
+  //console.log('uniqVisit===>', uniqVisit);
   ///////// Louder
   const [louderIsEnded, setLouderIsEnded] = useState(false);
   const appearingAnim = useRef(new Animated.Value(0)).current;
   const appearingSecondAnim = useRef(new Animated.Value(0)).current;
   //////////////////Parametrs
   const [idfa, setIdfa] = useState(false);
-  console.log('idfa==>', idfa);
+  //console.log('idfa==>', idfa);
   const [oneSignalId, setOneSignalId] = useState(null);
-  console.log('oneSignalId==>', oneSignalId);
+  //console.log('oneSignalId==>', oneSignalId);
   const [appsUid, setAppsUid] = useState(null);
   const [sab1, setSab1] = useState();
   const [pid, setPid] = useState();
-  console.log('appsUid==>', appsUid);
-  console.log('sab1==>', sab1);
-  console.log('pid==>', pid);
+  //console.log('appsUid==>', appsUid);
+  //console.log('sab1==>', sab1);
+  //console.log('pid==>', pid);
   const [customerUserId, setCustomerUserId] = useState(null);
-  console.log('customerUserID==>', customerUserId);
+  //console.log('customerUserID==>', customerUserId);
   const [idfv, setIdfv] = useState();
-  console.log('idfv==>', idfv);
+  //console.log('idfv==>', idfv);
   /////////Atributions
   const [adServicesToken, setAdServicesToken] = useState(null);
   //console.log('adServicesToken', adServicesToken);
   const [adServicesAtribution, setAdServicesAtribution] = useState(null);
   const [adServicesKeywordId, setAdServicesKeywordId] = useState(null);
 
-  // uniq_visit
-  useEffect(() => {
-    setTimeout(() => {
-      if (uniqVisit) {
-        fetch(
-          `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=uniq_visit&jthrhg=${timestamp_user_id}`,
-        );
-        OneSignal.User.addTag('timestamp_user_id', timestamp_user_id);
-        setUniqVisit(false); //
-        console.log('Відпрацював унік візит!!!!!!!!');
-      }
-    }, 500);
-  }, []);
+  // Генеруємо унікальний ID користувача з timestamp
+  /////////////Timestamp + user_id generation
+  const timestamp_user_id = `${new Date().getTime()}-${Math.floor(
+    1000000 + Math.random() * 9000000,
+  )}`;
+  //console.log('idForTag', timestamp_user_id);
 
   useEffect(() => {
+    checkUniqVisit();
     getData();
   }, []);
 
-  useEffect(() => {
-    setData();
-  }, [
-    route,
-    responseToPushPermition,
-    uniqVisit,
-    oneSignalId,
-    idfa,
-    appsUid,
-    sab1,
-    pid,
-    customerUserId,
-    idfv,
-    adServicesToken,
-    adServicesAtribution,
-    adServicesKeywordId,
-  ]);
-
-  const setData = async () => {
-    try {
-      const data = {
-        route,
-        responseToPushPermition,
-        uniqVisit,
-        oneSignalId,
-        idfa,
-        appsUid,
-        sab1,
-        pid,
-        customerUserId,
-        idfv,
-        adServicesToken,
-        adServicesAtribution,
-        adServicesKeywordId,
-      };
-      const jsonData = JSON.stringify(data);
-      await AsyncStorage.setItem('App', jsonData);
-      //console.log('Дані збережено в AsyncStorage');
-    } catch (e) {
-      //console.log('Помилка збереження даних:', e);
+  // uniq_visit
+  const checkUniqVisit = async () => {
+    const uniqVisitStatus = await AsyncStorage.getItem('uniqVisitStatus');
+    if (!uniqVisitStatus) {
+      await fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=uniq_visit&jthrhg=${timestamp_user_id}`,
+      );
+      console.log('унікальний візит!!!');
+      setUniqVisit(false);
+      await AsyncStorage.setItem('uniqVisitStatus', 'sent');
     }
   };
 
@@ -162,10 +126,54 @@ const App = () => {
         onInstallConversionDataCanceller();
       }
     } catch (e) {
-      console.log('Помилка отримання даних:', e);
+      console.log('Помилка отримання даних в getData:', e);
     }
   };
-  ///////// Ad Attribution
+
+  const setData = async () => {
+    try {
+      const data = {
+        route,
+        responseToPushPermition,
+        uniqVisit,
+        oneSignalId,
+        idfa,
+        appsUid,
+        sab1,
+        pid,
+        customerUserId,
+        idfv,
+        adServicesToken,
+        adServicesAtribution,
+        adServicesKeywordId,
+      };
+      const jsonData = JSON.stringify(data);
+      await AsyncStorage.setItem('App', jsonData);
+      //console.log('Дані збережено в AsyncStorage');
+    } catch (e) {
+      //console.log('Помилка збереження даних:', e);
+    }
+  };
+
+  useEffect(() => {
+    setData();
+  }, [
+    route,
+    responseToPushPermition,
+    uniqVisit,
+    oneSignalId,
+    idfa,
+    appsUid,
+    sab1,
+    pid,
+    customerUserId,
+    idfv,
+    adServicesToken,
+    adServicesAtribution,
+    adServicesKeywordId,
+  ]);
+
+  /////// Ad Attribution
   //fetching AdServices token
   const fetchAdServicesToken = async () => {
     try {
@@ -177,7 +185,7 @@ const App = () => {
       //console.error('Помилка при отриманні AdServices токену:', error.message);
     }
   };
-
+/
   //fetching AdServices data
   const fetchAdServicesAttributionData = async () => {
     try {
@@ -190,15 +198,6 @@ const App = () => {
       console.error('Помилка при отриманні даних AdServices:', error.message);
     }
   };
-
-  /////////////Timestamp + user_id generation
-  const generateSevenDigitNumber = () => {
-    return Math.floor(1000000 + Math.random() * 9000000); // Генерує число від 1000000 до 9999999
-  };
-  let timestamp = new Date().getTime();
-
-  const timestamp_user_id = `${timestamp}-${generateSevenDigitNumber()}`;
-  //console.log('idForTag', timestamp_user_id);
 
   ///////// OneSignall
   // 2abd1200-4d47-47c8-bd82-f9706b87ecf2
@@ -224,7 +223,7 @@ const App = () => {
       await requestPermission();
       // Якщо все Ok
     } catch (error) {
-      //console.log('err в requestOneSignallFoo==> ', error);
+      console.log('err в requestOneSignallFoo==> ', error);
     }
   };
 

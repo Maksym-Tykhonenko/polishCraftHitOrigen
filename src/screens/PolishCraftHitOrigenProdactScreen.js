@@ -14,10 +14,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LogLevel, OneSignal} from 'react-native-onesignal';
 
 const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
-  const [responseToPushPermition, setResponseToPushPermition] = useState(
-    route.params?.responseToPushPermition,
-  );
-  const [addPartToLinkOnce, setAddPartToLinkOnce] = useState(false);
+  //const [responseToPushPermition, setResponseToPushPermition] = useState(
+  //  route.params?.responseToPushPermition,
+  //);
+  const [addPartToLinkOnce, setAddPartToLinkOnce] = useState(true);
+  //console.log('addPartToLinkOnce==>', addPartToLinkOnce);
   ////////////////////////////////
   const [oneSignalId, setOneSignalId] = useState(route.params?.oneSignalId);
   const [idfa, setIdfa] = useState(route.params?.idfa);
@@ -54,15 +55,23 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     /**івент push_subscribe */
   }
   useEffect(() => {
-    // тільки перший раз
-    setTimeout(() => {
-      if (responseToPushPermition) {
-        console.log('Відпрацював івент push_subscribe');
+    const sendPushSubscribeEvent = async () => {
+      const pushSubscribeStatus = await AsyncStorage.getItem(
+        'pushSubscribeStatus',
+      );
+
+      // Відправляємо івент лише, якщо його ще не відправляли
+      if (!pushSubscribeStatus && route.params?.responseToPushPermition) {
         fetch(
-          `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_subscribe&jthrhg=${timestamp_user_id}`,
+          `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_subscribe&jthrhg=${route.params.timestamp_user_id}`,
         );
-        setResponseToPushPermition(true);
+        console.log('івент push_subscribe !!!');
+        await AsyncStorage.setItem('pushSubscribeStatus', 'sent');
       }
+    };
+
+    setTimeout(() => {
+      sendPushSubscribeEvent();
     }, 500);
   }, []);
 
@@ -70,11 +79,11 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     /**івент webview_open */
   }
   useEffect(() => {
-    // кожен раз
     setTimeout(() => {
       fetch(
-        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=webview_open&jthrhg=${timestamp_user_id}`,
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=webview_open&jthrhg=${route.params.timestamp_user_id}`,
       );
+      console.log('івент webview_open !!!');
     }, 500);
   }, []);
 
@@ -85,8 +94,8 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   useEffect(() => {
     setData();
   }, [
-    addPartToLinkOnce,
-    responseToPushPermition,
+    //addPartToLinkOnce,
+    //responseToPushPermition,
     idfa,
     uid,
     sab,
@@ -101,8 +110,8 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   const setData = async () => {
     try {
       const data = {
-        addPartToLinkOnce,
-        responseToPushPermition,
+        //addPartToLinkOnce,
+        //responseToPushPermition,
         idfa,
         uid,
         sab,
@@ -129,8 +138,8 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
       if (jsonData !== null) {
         const parsedData = JSON.parse(jsonData);
         //console.log('parsedData==>', parsedData);
-        setAddPartToLinkOnce(parsedData.addPartToLinkOnce);
-        setResponseToPushPermition(parsedData.responseToPushPermition);
+        //setAddPartToLinkOnce(parsedData.addPartToLinkOnce);
+        //setResponseToPushPermition(parsedData.responseToPushPermition);
         setIdfa(parsedData.idfa);
         setUid(parsedData.uid);
         setSab(parsedData.sab);
@@ -148,12 +157,9 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   };
 
   /////////////Timestamp + user_id generation
-  const generateSevenDigitNumber = () => {
-    return Math.floor(1000000 + Math.random() * 9000000); // Генерує число від 1000000 до 9999999
-  };
-  let timestamp = new Date().getTime();
-
-  const timestamp_user_id = `${timestamp}-${generateSevenDigitNumber()}`;
+  const timestamp_user_id = `${new Date().getTime()}-${Math.floor(
+    1000000 + Math.random() * 9000000,
+  )}`;
   //console.log('idForTag', timestamp_user_id);
 
   OneSignal.Notifications.addEventListener('click', event => {
@@ -161,18 +167,22 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
       fetch(
         `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_browser&jthrhg=${timestamp_user_id}`,
       );
-
-      console.log('Open with URL');
+      console.log('івент push_open_browser');
     } else {
       fetch(
         `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_webview&jthrhg=${timestamp_user_id}`,
       );
-      setAddPartToLinkOnce(true);
+      setAddPartToLinkOnce(false);
+      console.log('iвент2 push_open_webview');
       {
-        /** Done
-         * Єдиноразово додати до лінки product &yhugh=true !!!!!!!!!!!!!!!!!!*/
+        /** * Єдиноразово додати до лінки product &yhugh=true !!!!!!!!!!!!!!!!!!*/
       }
-      console.log('Open WebView');
+      //////
+
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=webview_open&jthrhg=${route.params.timestamp_user_id}`,
+      );
+      console.log('івент webview_open !!!');
     }
     //console.log('OneSignal: url:', event.notification.launchURL);
     //console.log('OneSignal: event:', event);
@@ -444,3 +454,5 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
 };
 
 export default PolishCraftHitOrigenProdactScreen;
+
+// LOG  NavigationState:  https://pay.neteller.com/wallet/checkout/options/login?sid=c3b943630e035540285911879e4002c1
