@@ -203,10 +203,18 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   let additionalParams = sabParts
     .map((part, index) => `sub_id_${index + 1}=${part}`)
     .join('&'); //
+
+  // Перевіряємо, чи в першому елементі саб частин є "Organic"
+  let shouldAddAdditionalParams = !(sabParts[0] && sabParts[0] === 'Organic');
+
   const product =
-    `${baseUrl}&${additionalParams}` +
+    `${baseUrl}` +
+    (shouldAddAdditionalParams && additionalParams
+      ? `&${additionalParams}`
+      : '') +
     (pid ? `&pid=${pid}` : '') +
     (!addPartToLinkOnce ? `&yhugh=true` : '');
+
   console.log('My product Url==>', product);
   //Alert.alert(product);
 
