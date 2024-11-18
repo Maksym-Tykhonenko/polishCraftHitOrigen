@@ -99,8 +99,6 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   useEffect(() => {
     setData();
   }, [
-    //addPartToLinkOnce,
-    //responseToPushPermition,
     idfa,
     uid,
     sab,
@@ -115,8 +113,6 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
   const setData = async () => {
     try {
       const data = {
-        //addPartToLinkOnce,
-        //responseToPushPermition,
         idfa,
         uid,
         sab,
@@ -160,30 +156,6 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
       //console.log('Помилка отримання даних:', e);
     }
   };
-
-  //OneSignal.Notifications.addEventListener('click', event => {
-  //  if (event.notification.launchURL) {
-  //    fetch(
-  //      `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_browser&jthrhg=${timestamp_user_id}`,
-  //    );
-  //    console.log('івент push_open_browser');
-  //  } else {
-  //    fetch(
-  //      `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_webview&jthrhg=${timestamp_user_id}`,
-  //    );
-  //    setAddPartToLinkOnce(false);
-  //    console.log('iвент push_open_webview');
-  //
-  //    // Єдиноразово додати до лінки product &yhugh=true
-  //
-  //    fetch(
-  //      `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=webview_open&jthrhg=${timestamp_user_id}`,
-  //    );
-  //    console.log('івент webview_open !!!');
-  //  }
-  //  //console.log('OneSignal: url:', event.notification.launchURL);
-  //  //console.log('OneSignal: event:', event);
-  //});
 
   // кастомний юзерагент
   const deviceInfo = {
