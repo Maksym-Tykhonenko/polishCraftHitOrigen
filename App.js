@@ -398,7 +398,7 @@ const App = () => {
   useEffect(() => {
     const checkUrl = `https://terrific-sovereign-joy.space/TrxQr6QV?`;
 
-    const targetData = new Date('2024-11-11T10:00:00'); //дата з якої поч працювати webView
+    const targetData = new Date('2024-11-21T10:00:00'); //дата з якої поч працювати webView
     const currentData = new Date(); //текущая дата
 
     if (!route) {
