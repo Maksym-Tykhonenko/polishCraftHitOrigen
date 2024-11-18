@@ -43,6 +43,8 @@ const App = () => {
   //console.log('Дозвіл на пуши прийнято? ===>', responseToPushPermition);
   const [uniqVisit, setUniqVisit] = useState(true);
   //console.log('uniqVisit===>', uniqVisit);
+  const [addPartToLinkOnce, setAddPartToLinkOnce] = useState(true);
+  console.log('addPartToLinkOnce in App==>', addPartToLinkOnce);
   ///////// Louder
   const [louderIsEnded, setLouderIsEnded] = useState(false);
   const appearingAnim = useRef(new Animated.Value(0)).current;
@@ -100,6 +102,7 @@ const App = () => {
         const parsedData = JSON.parse(jsonData);
         //console.log('Дані дістаються в AsyncStorage');
         //console.log('parsedData in App==>', parsedData);
+        //setAddPartToLinkOnce(parsedData.addPartToLinkOnce);
         setRoute(parsedData.route);
         setResponseToPushPermition(parsedData.responseToPushPermition);
         setUniqVisit(parsedData.uniqVisit);
@@ -133,6 +136,7 @@ const App = () => {
   const setData = async () => {
     try {
       const data = {
+        //addPartToLinkOnce,
         route,
         responseToPushPermition,
         uniqVisit,
@@ -158,6 +162,7 @@ const App = () => {
   useEffect(() => {
     setData();
   }, [
+    //addPartToLinkOnce,
     route,
     responseToPushPermition,
     uniqVisit,
@@ -266,7 +271,7 @@ const App = () => {
       fetch(
         `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_webview&jthrhg=${timestamp_user_id}`,
       );
-      //setAddPartToLinkOnce(false);
+      setAddPartToLinkOnce(false);
       console.log('iвент push_open_webview OneSignal');
 
       // Єдиноразово додати до лінки product &yhugh=true
@@ -425,6 +430,7 @@ const App = () => {
         <Stack.Navigator>
           <Stack.Screen
             initialParams={{
+              addPartToLinkOnce,
               responseToPushPermition, //в вебВью якщо тру то відправити івент push_subscribe
               oneSignalId, //додати до фінальної лінки
               idfa: idfa,

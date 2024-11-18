@@ -14,11 +14,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {LogLevel, OneSignal} from 'react-native-onesignal';
 
 const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
+  console.log('route==>', route.params);
   //const [responseToPushPermition, setResponseToPushPermition] = useState(
   //  route.params?.responseToPushPermition,
   //);
-  const [addPartToLinkOnce, setAddPartToLinkOnce] = useState(true);
-  //console.log('addPartToLinkOnce==>', addPartToLinkOnce);
+  const [addPartToLinkOnce, setAddPartToLinkOnce] = useState(
+    route.params?.addPartToLinkOnce,
+  );
+  console.log('addPartToLinkOnce==>', addPartToLinkOnce);
   ////////////////////////////////
   const [oneSignalId, setOneSignalId] = useState(route.params?.oneSignalId);
   const [idfa, setIdfa] = useState(route.params?.idfa);
@@ -57,9 +60,7 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     'applepay://',
   ];
 
-  {
-    /**івент push_subscribe */
-  }
+  //**івент push_subscribe
   useEffect(() => {
     const sendPushSubscribeEvent = async () => {
       const pushSubscribeStatus = await AsyncStorage.getItem(
@@ -81,9 +82,7 @@ const PolishCraftHitOrigenProdactScreen = ({navigation, route}) => {
     }, 500);
   }, []);
 
-  {
-    /**івент webview_open */
-  }
+  //**івент webview_open
   useEffect(() => {
     setTimeout(() => {
       fetch(
