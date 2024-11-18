@@ -256,6 +256,30 @@ const App = () => {
     fetchOneSignalId();
   }, []);
 
+  OneSignal.Notifications.addEventListener('click', event => {
+    if (event.notification.launchURL) {
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_browser&jthrhg=${timestamp_user_id}`,
+      );
+      console.log('івент push_open_browser OneSignal');
+    } else {
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=push_open_webview&jthrhg=${timestamp_user_id}`,
+      );
+      //setAddPartToLinkOnce(false);
+      console.log('iвент push_open_webview OneSignal');
+
+      // Єдиноразово додати до лінки product &yhugh=true
+
+      fetch(
+        `https://terrific-sovereign-joy.space/TrxQr6QV?utretg=webview_open&jthrhg=${timestamp_user_id}`,
+      );
+      console.log('івент webview_open OneSignal');
+    }
+    //console.log('OneSignal: url:', event.notification.launchURL);
+    //console.log('OneSignal: event:', event);
+  });
+
   ///////// AppsFlyer
   // 1ST FUNCTION - Ініціалізація AppsFlyer
   const performAppsFlyerOperations = async () => {
